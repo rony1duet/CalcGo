@@ -1,65 +1,47 @@
 package com.calc.go;
 
 import android.os.Bundle;
-import android.util.TypedValue;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView res, exp;
-    private String cur = "", op = "";
-    private Double val = null;
-    private boolean reset = true;
+    private EditText op1, op2;
+    private TextView res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        op1 = findViewById(R.id.editOp1);
+        op2 = findViewById(R.id.editOp2);
         res = findViewById(R.id.textResult);
-        exp = findViewById(R.id.textExpression);
 
-        // Numeric buttons
-        int[] nums = {R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9, R.id.btnDot};
-        for (int id : nums) findViewById(id).setOnClickListener(v -> {
-            if (reset) cur = ""; reset = false;
-            String s = ((Button) v).getText().toString();
-            if (!(s.equals(".") && cur.contains(".")) && cur.length() < 12) { cur += s; show(false); }
+        findViewById(R.id.btnAdd).setOnClickListener(v -> calc("+"));
+        findViewById(R.id.btnSubtract).setOnClickListener(v -> calc("-"));
+        findViewById(R.id.btnMultiply).setOnClickListener(v -> calc("×"));
+        findViewById(R.id.btnDivide).setOnClickListener(v -> calc("÷"));
+        findViewById(R.id.btnModulus).setOnClickListener(v -> calc("%"));
+        findViewById(R.id.btnAC).setOnClickListener(v -> {
+            op1.setText(""); op2.setText(""); res.setText(R.string.result_placeholder);
         });
-
-        // Operator buttons
-        int[] ops = {R.id.btnAdd, R.id.btnSubtract, R.id.btnMultiply, R.id.btnDivide, R.id.btnModulus};
-        for (int id : ops) findViewById(id).setOnClickListener(v -> {
-            if (!cur.isEmpty()) { if (val != null && !op.isEmpty()) calc(); else val = Double.parseDouble(cur); }
-            op = ((Button) v).getText().toString(); reset = true; show(false);
-        });
-
-        findViewById(R.id.btnEqual).setOnClickListener(v -> { calc(); op = ""; reset = true; });
-        findViewById(R.id.btnAC).setOnClickListener(v -> { cur = ""; val = null; op = ""; reset = true; show(false); });
-        findViewById(R.id.btnBackspace).setOnClickListener(v -> { if (!cur.isEmpty() && !reset) { cur = cur.substring(0, cur.length() - 1); show(false); } });
     }
 
-    private void calc() {
-        if (val == null || op.isEmpty() || cur.isEmpty()) return;
-        double n2 = Double.parseDouble(cur), r = 0;
-        boolean err = false;
-        switch (op) {
-            case "+": r = val + n2; break;
-            case "-": r = val - n2; break;
-            case "×": r = val * n2; break;
-            case "÷": if (n2 == 0) err = true; else r = val / n2; break;
-            case "%": if (n2 == 0) err = true; else r = val % n2; break;
-        }
-        if (err) { cur = "Error"; val = null; show(true); }
-        else { val = r; cur = fmt(r); show(false); }
-    }
-
-    private void show(boolean err) {
-        res.setText(cur.isEmpty() ? "0" : cur);
-        exp.setText(val == null || op.isEmpty() ? "" : fmt(val) + " " + op);
-        res.setTextSize(TypedValue.COMPLEX_UNIT_SP, err ? 28 : 56);
-        res.setTextColor(getColor(err ? R.color.error : android.R.color.tab_indicator_text));
+    private void calc(String op) {
+        String s1 = op1.getText().toString(), s2 = op2.getText().toString();
+        if (s1.isEmpty() || s2.isEmpty()) { res.setText(R.string.error_empty); return; }
+        try {
+            double n1 = Double.parseDouble(s1), n2 = Double.parseDouble(s2), r = 0;
+            switch (op) {
+                case "+": r = n1 + n2; break;
+                case "-": r = n1 - n2; break;
+                case "×": r = n1 * n2; break;
+                case "÷": if (n2 == 0) { res.setText(R.string.error_div_zero); return; } r = n1 / n2; break;
+                case "%": if (n2 == 0) { res.setText(R.string.error_mod_zero); return; } r = n1 % n2; break;
+            }
+            res.setText(String.format(Locale.US, "%s %s %s = %s", fmt(n1), op, fmt(n2), fmt(r)));
+        } catch (Exception e) { res.setText(R.string.error_invalid); }
     }
 
     private String fmt(double d) { return d == (long) d ? String.format(Locale.US, "%d", (long) d) : String.valueOf(d); }
