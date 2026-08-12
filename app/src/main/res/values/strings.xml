@@ -9,4 +9,6 @@
     <string name="error_div_zero">Div by 0</string>
     <string name="error_mod_zero">Mod by 0</string>
     <string name="error_invalid">Invalid Input</string>
+    <string name="op_placeholder">\?</string>
+    <string name="error_select">Select operation</string>
 </resources>
