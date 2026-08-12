@@ -1,15 +1,7 @@
 <resources>
     <string name="app_name">Calc Go</string>
     <string name="title">Calc Go</string>
-    <string name="hint_number1">Operand 1</string>
-    <string name="hint_number2">Operand 2</string>
+    <string name="result_placeholder">0</string>
     <string name="btn_clear">C</string>
-    <string name="result_placeholder">Ready</string>
-    <string name="error_empty_fields">Enter operands</string>
-    <string name="error_invalid_format">Invalid format</string>
-    <string name="operator_placeholder">\?</string>
     <string name="btn_equal">=</string>
-    <string name="label_select_op">Select Operation</string>
-    <string name="error_select_op">Select operation</string>
-    <string name="label_result">Result</string>
 </resources>
